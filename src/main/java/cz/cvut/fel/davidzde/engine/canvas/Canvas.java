@@ -56,8 +56,10 @@ public class Canvas {
 
         mesh = new Mesh(positions, indices, colors, texture, textureClip);
 
-        object = new GameObject(mesh, new Vector2f(0.0f, 0.0f));
+        /*object = new GameObject(mesh, new Vector2f(0.0f, 0.0f));
         object.getMatrix().translate(-0.75f, 0.75f, 0f); // set to left top corner
+*/
+        setGameObjects();
 
         sp = new ShaderProgram(vs.getShaderId(), fs.getShaderId());
         sp.link();
@@ -80,27 +82,39 @@ public class Canvas {
         glClearColor(0f, 0f, 0f, 1f);
 
         sp.use();
-        drawWE();
+        drawAllGameObjects();
     }
 
-    private void drawAll() {
-        for (int i = 0; i < 16; i++) {
-
+    private void setGameObjects() {
+        gameObjects = new GameObject[16][16];
+        for (int i = 0; i < gameObjects.length; i++) {
+            for (int j = 0; j < gameObjects[0].length; j++) {
+                gameObjects[i][j] = new GameObject(mesh, new Vector2f(0f, 0f));
+                gameObjects[i][j].getMatrix().translate(-0.75f, 0.75f, 0f);
+            }
         }
     }
 
-    private void drawWE() {
-        sp.setUniform(UniformName.MATRIX, object.getMatrix());
+    private void drawAllGameObjects() {
+        for (GameObject[] row : gameObjects) {
+            for (GameObject gameObject : row) {
+                drawGameObject(gameObject);
+            }
+        }
+    }
+
+    private void drawGameObject(GameObject gameObject) {
+        sp.setUniform(UniformName.MATRIX, gameObject.getMatrix());
 
         glEnableVertexAttribArray(AttributeLocations.POSITION);
         glEnableVertexAttribArray(AttributeLocations.COLOR);
         glEnableVertexAttribArray(AttributeLocations.TEXTURE);
 
-        glActiveTexture(mesh.getTexture().getId());
+        glActiveTexture(gameObject.getMesh().getTexture().getId());
 
-        glBindTexture(GL_TEXTURE_2D, mesh.getTexture().getId());
+        glBindTexture(GL_TEXTURE_2D, gameObject.getMesh().getTexture().getId());
 
-        glBindVertexArray(mesh.getVaoid());
+        glBindVertexArray(gameObject.getMesh().getVaoid());
         glDrawElements(GL_TRIANGLES, indices.length, GL_UNSIGNED_INT, 0);
     }
 
