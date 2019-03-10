@@ -1,10 +1,10 @@
 package cz.cvut.fel.davidzde.engine.canvas;
 
 import cz.cvut.fel.davidzde.engine.AttributeLocations;
-import cz.cvut.fel.davidzde.engine.Shader.FragmentShader;
-import cz.cvut.fel.davidzde.engine.Shader.ShaderProgram;
-import cz.cvut.fel.davidzde.engine.Shader.UniformName;
-import cz.cvut.fel.davidzde.engine.Shader.VertexShader;
+import cz.cvut.fel.davidzde.engine.shader.FragmentShader;
+import cz.cvut.fel.davidzde.engine.shader.ShaderProgram;
+import cz.cvut.fel.davidzde.engine.shader.UniformName;
+import cz.cvut.fel.davidzde.engine.shader.VertexShader;
 import cz.cvut.fel.davidzde.engine.draw.GameObject;
 import cz.cvut.fel.davidzde.engine.draw.Mesh;
 import cz.cvut.fel.davidzde.engine.texture.Texture;
@@ -18,19 +18,12 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public class Canvas {
 
-    int[] indicies = {0, 1, 3, 3, 1, 2};
-    float[] verticies = {
+    int[] indices = {0, 1, 3, 3, 1, 2};
+    float[] positions = {
             -0.25f, 0.25f, 0,
             0.25f, 0.25f, 0,
             0.25f, -0.25f, 0,
             -0.25f, -0.25f, 0,
-    };
-
-    float[] verticies2 = {
-            0.75f, 0.75f, 0,
-            1f, 0.75f, 0,
-            1f, 1f, 0,
-            0.75f, 1f, 0,
     };
 
     private float[] colors = {
@@ -42,9 +35,9 @@ public class Canvas {
 
     ShaderProgram sp;
     Mesh mesh;
-    Mesh mesh2;
     GameObject object;
     private long window;
+    GameObject[][] gameObjects;
 
     // TODO generate inteface update render
     public Canvas(long window) {
@@ -61,11 +54,10 @@ public class Canvas {
                 0, 1
         };
 
-        mesh = new Mesh(verticies, indicies, colors, texture, textureClip);
+        mesh = new Mesh(positions, indices, colors, texture, textureClip);
 
-        mesh2 = new Mesh(verticies2, indicies, colors, texture, textureClip);
-
-        object = new GameObject(mesh, new Vector2f(0.1f, 0.1f));
+        object = new GameObject(mesh, new Vector2f(0.0f, 0.0f));
+        object.getMatrix().translate(-0.75f, 0.75f, 0f); // set to left top corner
 
         sp = new ShaderProgram(vs.getShaderId(), fs.getShaderId());
         sp.link();
@@ -74,8 +66,6 @@ public class Canvas {
         sp.setUniform(UniformName.TEXTURE, 0);
 
         sp.createUniform(UniformName.MATRIX);
-
-
     }
 
     public void update() {
@@ -93,9 +83,15 @@ public class Canvas {
         drawWE();
     }
 
+    private void drawAll() {
+        for (int i = 0; i < 16; i++) {
+
+        }
+    }
 
     private void drawWE() {
         sp.setUniform(UniformName.MATRIX, object.getMatrix());
+
         glEnableVertexAttribArray(AttributeLocations.POSITION);
         glEnableVertexAttribArray(AttributeLocations.COLOR);
         glEnableVertexAttribArray(AttributeLocations.TEXTURE);
@@ -105,18 +101,7 @@ public class Canvas {
         glBindTexture(GL_TEXTURE_2D, mesh.getTexture().getId());
 
         glBindVertexArray(mesh.getVaoid());
-        glDrawElements(GL_TRIANGLES, indicies.length, GL_UNSIGNED_INT, 0);
-
-        glEnableVertexAttribArray(AttributeLocations.POSITION);
-        glEnableVertexAttribArray(AttributeLocations.COLOR);
-        glEnableVertexAttribArray(AttributeLocations.TEXTURE);
-
-        glActiveTexture(mesh2.getTexture().getId());
-
-        glBindTexture(GL_TEXTURE_2D, mesh2.getTexture().getId());
-
-        glBindVertexArray(mesh2.getVaoid());
-        glDrawElements(GL_TRIANGLES, indicies.length, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, indices.length, GL_UNSIGNED_INT, 0);
     }
 
 }

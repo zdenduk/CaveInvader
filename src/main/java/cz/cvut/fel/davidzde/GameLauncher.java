@@ -1,7 +1,6 @@
 package cz.cvut.fel.davidzde;
 
 import cz.cvut.fel.davidzde.window.Window;
-import org.lwjgl.system.Configuration;
 
 public class GameLauncher {
 

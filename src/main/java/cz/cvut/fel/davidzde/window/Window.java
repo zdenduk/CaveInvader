@@ -72,10 +72,6 @@ public class Window {
 
         Canvas canvas = new Canvas(window);
 
-        double secsPerUpdate = 1.0d / 30.0d;
-        double previous = glfwGetTime();
-        double steps = 0.0;
-
         // game loop TODO fix this with game loop
         float elapsedTime;
         float accumulator = 0f;
@@ -114,6 +110,7 @@ public class Window {
             try {
                 Thread.sleep(1);
             } catch (InterruptedException ie) {
+                ie.printStackTrace();
             }
         }
     }
